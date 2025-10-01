@@ -14,25 +14,11 @@ spec:
       labels:
         app: counter-backend
     spec:
+      imagePullSecrets:
+      - name: dockerhub-secret
       containers:
       - name: counter-backend
-        image: counter-backend:latest
-        imagePullPolicy: Never  # Koristi lokalni image
+        image: zoddo16/counter-backend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
-        env:
-        - name: ENVIRONMENT
-          value: "production"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend-service
-spec:
-  selector:
-    app: counter-backend
-  ports:
-    - protocol: TCP
-      port: 8000
-      targetPort: 8000
-  type: ClusterIP
