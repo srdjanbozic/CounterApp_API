@@ -29,7 +29,6 @@ jobs:
 
     - name: Run tests
       run: |
-        # Dodajte testove kada budete imali
         echo "Running tests..."
         # python -m pytest
 
@@ -62,21 +61,13 @@ jobs:
 
   deploy:
     needs: build-and-push
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: github.ref == 'refs/heads/main'
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'v1.28.0'
-
-    - name: Deploy to Kubernetes
+    - name: Deploy to Minikube
       run: |
-        kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER_NAME=${{ secrets.DOCKER_USERNAME }}/counter-backend:latest
-        kubectl rollout status deployment/$DEPLOYMENT_NAME
-      env:
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
+        kubectl --kubeconfig=/home/zodd/.kube/config get nodes
+        kubectl --kubeconfig=/home/zodd/.kube/config set image deployment/backend-deployment counter-backend=${{ secrets.DOCKER_USERNAME }}/counter-backend:latest
+        kubectl --kubeconfig=/home/zodd/.kube/config rollout status deployment/backend-deployment
+        echo "🎉 Deploy completed!"
