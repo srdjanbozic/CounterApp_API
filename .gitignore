@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments
+.venv
+venv/
+
+# Docker
+docker-compose.yml
+.dockerignore
+
+# Kubernetes
+minikube-*
+.kube/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.bin
+*.exe
+*.tar.gz
+*.so
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite3
