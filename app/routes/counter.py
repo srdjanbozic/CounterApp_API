@@ -1,31 +1,35 @@
 from fastapi import APIRouter
+import asyncio
 
 router = APIRouter(prefix="/api", tags=["counter"])
 
-# In memory storage
+# In memory storage sa lock-om
 counter_value = {"value": 0}
+counter_lock = asyncio.Lock()
 
 @router.get("/counter")
-def get_counter():
+async def get_counter():
     """Vrati trenutnu vrednost brojaca"""
-    return counter_value
+    async with counter_lock:
+        return counter_value
 
 @router.post("/increment")
-def increment_counter():
+async def increment_counter():
     """Uvecaj brojac za 1"""
-    counter_value["value"] += 1
-    return counter_value
+    async with counter_lock:
+        counter_value["value"] += 1
+        return counter_value.copy()  # Vrati kopiju
 
 @router.post("/decrement")
-def decrement_counter():
+async def decrement_counter():
     """Smanji brojač za 1"""
-    counter_value["value"] -= 1
-    return counter_value
-
+    async with counter_lock:
+        counter_value["value"] -= 1
+        return counter_value.copy()
 
 @router.post("/reset")
-def reset_counter():
+async def reset_counter():
     """Resetuj brojač na 0"""
-    counter_value["value"] = 0
-    return counter_value
-
+    async with counter_lock:
+        counter_value["value"] = 0
+        return counter_value.copy()
