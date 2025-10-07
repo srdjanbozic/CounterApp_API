@@ -41,36 +41,28 @@ jobs:
         TAG=${{ steps.tags.outputs.sha }}
         BRANCH=${{ steps.tags.outputs.branch }}
         
-        # Build and push with SHA tag
         docker build -t ${IMAGE}:${TAG} .
         docker push ${IMAGE}:${TAG}
         
-        # Tag and push with env-latest
         docker tag ${IMAGE}:${TAG} ${IMAGE}:${{ env.ENV }}-latest
         docker push ${IMAGE}:${{ env.ENV }}-latest
         
-        # Tag and push with branch name (backward compatibility)
         docker tag ${IMAGE}:${TAG} ${IMAGE}:${BRANCH}
         docker push ${IMAGE}:${BRANCH}
-        
-        echo "Pushed tags: ${TAG}, ${{ env.ENV }}-latest, ${BRANCH}"
     
     - name: Update Deployment
       run: |
         NAMESPACE=counterapp-${{ env.ENV }}
         
-        # Set new image
         kubectl set image deployment/backend-deployment \
           counter-backend=${IMAGE}:${{ steps.tags.outputs.sha }} \
           -n ${NAMESPACE}
         
-        # Wait for rollout to complete
         kubectl rollout status deployment/backend-deployment \
-          -n ${NAMESPACE} \
-          --timeout=300s
+          -n ${NAMESPACE} --timeout=300s
     
     - name: Verify Deployment
       run: |
         NAMESPACE=counterapp-${{ env.ENV }}
-        echo "✅ Deployment completed successfully!"
+        echo "✅ Deployment completed!"
         kubectl get pods -n ${NAMESPACE} -l app=counter-backend
